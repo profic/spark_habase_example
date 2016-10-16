@@ -1,0 +1,21 @@
+1)copy from hdfs
+
+/home - local path
+
+sudo hadoop fs -copyToLocal /test2/81.txt /home
+
+2) grep txt file
+
+hadoop fs -cat /test2/81.txt
+
+3) list files in folder:
+
+hadoop fs -ls /folderName
+
+4) remove folder:
+
+sudo -u hdfs hadoop fs -rm -r -f /pathToFolder
+
+5) clean trash:
+
+sudo -u hdfs hdfs dfs -expunge
