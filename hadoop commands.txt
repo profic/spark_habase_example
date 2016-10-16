@@ -2,7 +2,7 @@
 
 /home - local path
 
-sudo hadoop fs -copyToLocal /test2/81.txt /home
+sudo hadoop fs -copyToLocal /hadoopPath /localPath
 
 2) grep txt file
 
@@ -19,3 +19,17 @@ sudo -u hdfs hadoop fs -rm -r -f /pathToFolder
 5) clean trash:
 
 sudo -u hdfs hdfs dfs -expunge
+
+5.1) leave safe mode:
+
+sudo -u hdfs hadoop dfsadmin -safemode leave
+
+
+6)
+
+spark-submit --class com.cloudera.sparkwordcount.CompletedTask --master local target/sparkwordcount-0.0.1-SNAPSHOT.jar file:///home/cloudera/Downloads/data/task4 5
+
+sudo -u hdfs hadoop fs -rm -r -f /user/cloudera/saveToHadoop
+
+hadoop fs -copyToLocal /user/cloudera/saveToHadoop /home/cloudera/Downloads/result
+
