@@ -18,13 +18,14 @@ object CompletedTask {
 
   def main(args: Array[String]) {
 
-    if (args.length < 1) {
-      throw new IllegalArgumentException("Please provide input folder name and partition count(optional, default is 1)")
+    if (args.length < 2) {
+      throw new IllegalArgumentException("Please provide input folder, output folder and partition count(optional, default is 1)")
     }
 
     val inputFolder: String = args(0)
+    val outputFolder = args(1)
 
-    val minPartitions: Int = args.lift(1).map(_.toInt).getOrElse(defaultPartitionNum)
+    val minPartitions: Int = args.lift(2).map(_.toInt).getOrElse(defaultPartitionNum)
 
     val sc = new SparkContext(new SparkConf().setAppName("Test"))
 
@@ -38,8 +39,6 @@ object CompletedTask {
       .map({ case (chunkNum, contentParts) =>
         (chunkNum + filePostfix, mergeContent(contentParts))
       })
-
-    val outputFolder = inputFolder
 
     groupedByFileName.saveAsHadoopFile(
       outputFolder,
