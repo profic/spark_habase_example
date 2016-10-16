@@ -39,7 +39,8 @@ object SaveToHadoop {
 
     val files = sc.wholeTextFiles(inputFolder, minPartitions)
 
-    val contentPartsByFileName: RDD[(String, ContentPart)] = files.map(splitContentPartByFilename)
+    val contentPartsByFileName: RDD[(String, ContentPart)] =
+      files.map(splitContentPartByFilename)
 
     val groupedByFileName =
       contentPartsByFileName.groupBy({ case (fileName, _) => fileName })
@@ -49,7 +50,11 @@ object SaveToHadoop {
 
     val outputFile = "/user/cloudera/saveToHadoop"
 
-    groupedByFileName.saveAsHadoopFile(outputFile, classOf[String], classOf[String], classOf[RDDKeyMultipleTextOutputFormat])
+    groupedByFileName.saveAsHadoopFile(
+      outputFile,
+      classOf[String],
+      classOf[String],
+      classOf[RDDKeyMultipleTextOutputFormat])
 
   }
 }
