@@ -1,6 +1,6 @@
 package com.cloudera.sparkwordcount
 
-import org.apache.commons.lang3.StringUtils
+import org.apache.commons.io.FilenameUtils
 import org.apache.spark.rdd.RDD
 import org.apache.spark.{SparkConf, SparkContext}
 
@@ -10,42 +10,48 @@ import scala.collection.mutable
 
 object SaveToHadoop2 {
 
-  val inputFolder: String = "file:///home/cloudera/Downloads/data/task3"
-  val minPartitions: Int = 333
+  val inputFolder: String = "file:///home/cloudera/Downloads/data/task4"
+  val minPartitions: Int = 5
+  val partSeparator = "_"
 
   type ContentPart = (String, String)
 
-  implicit val ord: Ordering[ContentPart] = Ordering.by[ContentPart, String](_._1)
+  implicit val ord: Ordering[ContentPart] = Ordering.by(_._1)
 
   def main(args: Array[String]) {
-    val sc = new SparkContext(new SparkConf().setAppName("Spark Count"))
+    val sc = new SparkContext(new SparkConf().setAppName("Test"))
 
-    val files = sc.wholeTextFiles(inputFolder, minPartitions)
+    def splitContentPartByFilename(fileNameByContent: (String, String)): (String, (ContentPart)) =
+      fileNameByContent match {
+        case (filename, content) =>
+          val split: Array[String] = FilenameUtils.getName(filename).split(partSeparator)
 
-    val contentPartsByFileName: RDD[(String, ContentPart)] = files.map({ case (filename, content) =>
-
-      val split: Array[String] = filename.substring(filename.lastIndexOf("/") + 1)
-                                 .split("_")
-      val fileNum = split(0)
-      val filePart = StringUtils.substringBefore(split(1), ".")
-
-      (fileNum, (filePart, content))
-    })
+          split match {
+            case Array(fileNum, filePart) =>
+              (fileNum, (FilenameUtils.removeExtension(filePart), content))
+          }
+      }
 
     def mergeContent(contentParts: Iterable[(String, ContentPart)]): String = {
-      val content: Iterable[ContentPart] = contentParts.map({ case (_, (part, contentPart)) => (part, contentPart) })
+      val content: Iterable[ContentPart] =
+        contentParts.map({ case (_, contentPart) => contentPart })
 
       (mutable.TreeSet[ContentPart]() ++= content).map(_._2).mkString
     }
+
+    val files = sc.wholeTextFiles(inputFolder, minPartitions)
+
+    val contentPartsByFileName: RDD[(String, ContentPart)] = files.map(splitContentPartByFilename)
+
     val groupedByFileName =
       contentPartsByFileName.groupBy({ case (fileName, _) => fileName })
       .map({ case (fileName, contentParts) =>
         (fileName, mergeContent(contentParts))
       })
 
-    val file = "/user/cloudera/saveToHadoop"
+    val outputFile = "/user/cloudera/saveToHadoop"
 
-    groupedByFileName.saveAsHadoopFile(file, classOf[String], classOf[String], classOf[RDDKeyMultipleTextOutputFormat])
+    groupedByFileName.saveAsHadoopFile(outputFile, classOf[String], classOf[String], classOf[RDDKeyMultipleTextOutputFormat])
 
   }
 }
