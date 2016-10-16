@@ -18,13 +18,15 @@ object CompletedTask {
 
   def main(args: Array[String]) {
 
+    if (args.length < 1) {
+      throw new IllegalArgumentException("Please provide input folder name and partition count(optional, default is 1)")
+    }
+
     val inputFolder: String = args(0)
-    val minPartitions: Int =
-      if (args.length == 1) args(1).toInt else defaultPartitionNum
+
+    val minPartitions: Int = args.lift(1).map(_.toInt).getOrElse(defaultPartitionNum)
 
     val sc = new SparkContext(new SparkConf().setAppName("Test"))
-
-
 
     val files = sc.wholeTextFiles(inputFolder, minPartitions)
 
@@ -37,10 +39,10 @@ object CompletedTask {
         (fileName + filePostfix, mergeContent(contentParts))
       })
 
-    val outputFile = "/user/cloudera/saveToHadoop"
+    val outputFolder = inputFolder
 
     groupedByFileName.saveAsHadoopFile(
-      outputFile,
+      outputFolder,
       classOf[String],
       classOf[String],
       classOf[RDDKeyMultipleTextOutputFormat])
