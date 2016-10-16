@@ -30,13 +30,13 @@ object CompletedTask {
 
     val files = sc.wholeTextFiles(inputFolder, minPartitions)
 
-    val contentPartsByFileName: RDD[(String, ContentPart)] =
+    val contentPartsByChunkNum: RDD[(String, ContentPart)] =
       files.map(splitContentPartByFilename)
 
     val groupedByFileName =
-      contentPartsByFileName.groupBy({ case (fileName, _) => fileName })
-      .map({ case (fileName, contentParts) =>
-        (fileName + filePostfix, mergeContent(contentParts))
+      contentPartsByChunkNum.groupBy({ case (fileName, _) => fileName })
+      .map({ case (chunkNum, contentParts) =>
+        (chunkNum + filePostfix, mergeContent(contentParts))
       })
 
     val outputFolder = inputFolder
@@ -55,8 +55,8 @@ object CompletedTask {
         val split: Array[String] = FilenameUtils.getName(filename).split(partSeparator)
 
         split match {
-          case Array(fileNum, filePart) =>
-            (fileNum, (FilenameUtils.removeExtension(filePart), content))
+          case Array(chunkNum, fileNamePart) =>
+            (chunkNum, (FilenameUtils.removeExtension(fileNamePart), content))
         }
     }
 

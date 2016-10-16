@@ -27,7 +27,11 @@ sudo -u hdfs hadoop dfsadmin -safemode leave
 
 6)
 
-spark-submit --class com.cloudera.sparkwordcount.CompletedTask --master local target/sparkwordcount-0.0.1-SNAPSHOT.jar file:///home/cloudera/Downloads/data/task4 5
+sudo -u hdfs hadoop fs -put /path/in/linux /hdfs/path
+
+sudo -u hdfs hadoop fs -put /home/cloudera/Downloads/data/small /user/cloudera/task
+
+spark-submit --class com.cloudera.sparkwordcount.CompletedTask --master local target/sparkwordcount-0.0.1-SNAPSHOT.jar /user/cloudera/task 20
 
 sudo -u hdfs hadoop fs -rm -r -f /user/cloudera/saveToHadoop
 
