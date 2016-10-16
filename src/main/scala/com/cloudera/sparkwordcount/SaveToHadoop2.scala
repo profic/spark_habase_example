@@ -10,10 +10,6 @@ import scala.collection.mutable
 
 object SaveToHadoop2 {
 
-  /*
-  1_52,1_73,1_94,1_4,1_18,1_39,1_19,1_86,1_24,1_45,1_66,1_87,1_50
-   */
-
   val inputFolder: String = "file:///home/cloudera/Downloads/data/task3"
   val minPartitions: Int = 333
 
@@ -41,9 +37,11 @@ object SaveToHadoop2 {
 
       (mutable.TreeSet[ContentPart]() ++= content).map(_._2).mkString
     }
-    val groupedByFileName = contentPartsByFileName.groupBy({ case (fileName, _) => fileName }).map({ case (fileName, contentParts) =>
-      (fileName, mergeContent(contentParts))
-    })
+    val groupedByFileName =
+      contentPartsByFileName.groupBy({ case (fileName, _) => fileName })
+      .map({ case (fileName, contentParts) =>
+        (fileName, mergeContent(contentParts))
+      })
 
     val file = "/user/cloudera/saveToHadoop"
 

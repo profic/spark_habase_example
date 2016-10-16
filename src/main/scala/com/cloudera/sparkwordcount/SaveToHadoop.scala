@@ -6,8 +6,6 @@ import org.apache.spark.{SparkConf, SparkContext}
 
 import scala.collection.mutable
 
-// sc.textFile("/home/cloudera/Downloads/data/test")
-
 object SaveToHadoop {
 
   private val inputFolder: String = "file:///home/cloudera/Downloads/data/small/*_[a-c].txt"
