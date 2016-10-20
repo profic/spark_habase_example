@@ -1,4 +1,4 @@
-package com.cloudera.sparkwordcount
+package com.cloudera.task
 
 import org.apache.hadoop.io.NullWritable
 import org.apache.hadoop.mapred.lib.MultipleTextOutputFormat

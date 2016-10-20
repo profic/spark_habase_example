@@ -1,4 +1,4 @@
-package com.cloudera.sparkwordcount
+package com.cloudera.task
 
 import org.apache.commons.io.FilenameUtils
 import org.apache.spark.rdd.RDD
@@ -67,3 +67,4 @@ object CompletedTask {
   }
 
 }
+
